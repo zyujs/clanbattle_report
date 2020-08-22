@@ -215,8 +215,8 @@ async def send_report(bot, event, background):
     for challenge in challenge_list:
         total_damage += challenge['damage']
         times_to_boss[challenge['boss_num']-1] += 1
-        damage_to_boss[challenge['boss_num']-1] += challenge['damage']
         if not challenge['is_continue']:
+            damage_to_boss[challenge['boss_num']-1] += challenge['damage']  #尾刀伤害不计入单boss总伤害，防止avg异常
             truetimes_to_boss[challenge['boss_num']-1] += 1
             total_challenge += 1
             if challenge['damage'] == 0:    #掉刀
