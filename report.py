@@ -353,8 +353,6 @@ async def create_clanbattle_report(bot, event: CQEvent):
 
 @sv.on_prefix('设置工会api')
 async def set_clanbattle_api(bot, event: CQEvent):
-    if event.message_type != 'group':
-        return
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
         return
@@ -367,8 +365,6 @@ async def set_clanbattle_api(bot, event: CQEvent):
 
 @sv.on_fullmatch('查看工会api')
 async def get_clanbattle_api(bot, event: CQEvent):
-    if event.message_type != 'group':
-        return
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
         return
@@ -377,8 +373,6 @@ async def get_clanbattle_api(bot, event: CQEvent):
 
 @sv.on_fullmatch('清除工会api')
 async def delete_clanbattle_api(bot, event: CQEvent):
-    if event.message_type != 'group':
-        return
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
         return
