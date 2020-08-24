@@ -20,7 +20,7 @@ constellation_name = ['？？？', '水瓶', '双鱼', '白羊', '金牛', '双�
 cycle_data = {
     'cn': {
         'cycle_mode': 'days',
-        'cycle_days': 28, 
+        'cycle_days': 27,   #不知道为什么阿B把这次改成27天了
         'base_date': datetime.date(2020, 7, 28),  #从巨蟹座开始计算
         'base_month': 5
     },
@@ -351,7 +351,7 @@ async def create_resign_report(bot, event: CQEvent):
 async def create_clanbattle_report(bot, event: CQEvent):
     await send_report(bot, event, bg_report)
 
-@sv.on_prefix('设置工会api')
+@sv.on_prefix(('设置工会api', '设置公会api'))
 async def set_clanbattle_api(bot, event: CQEvent):
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
@@ -363,7 +363,7 @@ async def set_clanbattle_api(bot, event: CQEvent):
     save_group_api(event.group_id, api_url)
     await bot.send(event, f'本群工会API已设置为 {api_url}', at_sender=True)
 
-@sv.on_fullmatch('查看工会api')
+@sv.on_fullmatch(('查看工会api', '查看公会api'))
 async def get_clanbattle_api(bot, event: CQEvent):
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
@@ -371,7 +371,7 @@ async def get_clanbattle_api(bot, event: CQEvent):
     api_url = load_group_api(event.group_id)
     await bot.send(event, f'本群工会API为 {api_url}', at_sender=True)
 
-@sv.on_fullmatch('清除工会api')
+@sv.on_fullmatch(('清除工会api', '清除公会api'))
 async def delete_clanbattle_api(bot, event: CQEvent):
     if not priv.check_priv(event,priv.ADMIN):
         await bot.send(event, '该操作需要管理员权限', at_sender=True)
