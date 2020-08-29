@@ -22,9 +22,16 @@
 - `查看工会api` : (需要管理员权限)查看本群设置的Yobot API
 - `清除工会api` : (需要管理员权限)清除本群设置的Yobot API
 
-例: 生成会战报告 http://localhost:9222/yobot/clan/1234567890/statistics/api/?apikey=abcdefg
- 
-API获取方式: Yobot工会面板 - 统计 - 获取api 
+例: 
+```
+生成会战报告 http://localhost:9222/yobot/clan/1234567890/statistics/api/?apikey=abcdefg
+生成离职报告 @内鬼 http://localhost:9222/yobot/clan/1234567890/statistics/api/?apikey=abcdefg
+设置工会api http://localhost:9222/yobot/clan/1234567890/statistics/api/?apikey=abcdefg
+生成会战报告
+生成离职报告 @内鬼
+```
+
+**API获取方式** : Yobot工会面板 - 统计 - 获取api 
 
 API格式为 `http://{yobot服务器}:{端口}/yobot/clan/{群号}/statistics/api/?apikey={key}`
 
