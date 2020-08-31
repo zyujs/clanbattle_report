@@ -165,7 +165,7 @@ def get_constellation(server='cn'):
     else:   #天数周期循环 国服
         during_month = (today - cdata['base_date']).days // cdata['cycle_days']
         month = during_month + cdata['base_month']
-        month = month % 12 + 1
+        month = month % 12
     return constellation_name[month]
 
 def add_text(img: Image,text:str,textsize:int,font=font_path,textfill='black',position:tuple=(0,0)):
