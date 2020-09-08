@@ -269,7 +269,7 @@ async def send_report(bot, event, background):
             avg_boss_damage[i] = damage_to_boss[i] // truetimes_to_boss[i]    #尾刀不计入均伤和出刀图表
     
     #设置中文字体
-    plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+    plt.rcParams['font.family']=['SimHei'] #用来正常显示中文标签
     plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
     x = [f'{x}王' for x in range(1,6)]
     y = truetimes_to_boss
