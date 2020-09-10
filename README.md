@@ -41,23 +41,6 @@ API格式为 `http://{yobot服务器}:{端口}/yobot/clan/{群号}/statistics/ap
 
 每月工会战开始之前生成上次工会战报告,开始后后生成本次工会战报告,国服暂时按照28天周期计算.
 
-## 字体问题
-
-如果出现文字位置异常或者中文字符显示为方框情况，需要安装字体.
-
-### windows
-
-1. 直接双击本项目内 `SimHei.ttf` 字体文件安装
-
-### linux
-
-1. 使用命令 `pip show matplotlib` 找到matplotlib的安装位置
-1. 将本项目内 `SimHei.ttf` 文件复制 matplotlib/mpl_data/fonts/ttf/ 目录
-1. 删除matplotlib缓存文件夹 `rm -rf ~/.cache/matplotlib`
-1. 重启HoshinoBot
-
-注意: 如果你的HoshinoBot在docker中运行,请进入容器内部进行上述操作.
-
 ## 鸣谢
 
 - 倚栏待月 : 基础代码编写

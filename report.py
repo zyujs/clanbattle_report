@@ -10,7 +10,7 @@ from hoshino import Service, priv
 from hoshino.util import FreqLimiter
 from hoshino.typing import CQEvent
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
+import matplotlib.font_manager as font_manager
 from PIL import Image,ImageFont,ImageDraw
 import math
 
@@ -269,8 +269,10 @@ async def send_report(bot, event, background):
             avg_boss_damage[i] = damage_to_boss[i] // truetimes_to_boss[i]    #尾刀不计入均伤和出刀图表
     
     #设置中文字体
+    font_manager.fontManager.addfont(font_path)
     plt.rcParams['font.family']=['SimHei'] #用来正常显示中文标签
     plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+
     x = [f'{x}王' for x in range(1,6)]
     y = truetimes_to_boss
     plt.figure(figsize=(4.3,2.8))
