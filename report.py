@@ -22,7 +22,7 @@ constellation_name = ['？？？', '水瓶', '双鱼', '白羊', '金牛', '双�
 cycle_data = {
     'cn': {
         'cycle_mode': 'days',
-        'cycle_days': 27,   #不知道为什么阿B把这次改成27天了
+        'cycle_days': 28,
         'base_date': datetime.date(2020, 7, 28),  #从巨蟹座开始计算
         'base_month': 5,
         'battle_days': 6,
