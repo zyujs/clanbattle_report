@@ -178,7 +178,53 @@ def add_text(img: Image,text:str,textsize:int,font=font_path,textfill='black',po
     draw.text(xy=position,text=text,font=img_font,fill=textfill)
     return img
 
-async def send_report(bot, event, background):
+async def get_data_from_yobot(api_url, qqid):
+    result = {
+        'code': 1,
+        'msg': '',
+        'nickname': '',
+        'clanname': '',
+        'game_server': 'cn',
+        'challenge_list': [],
+    }
+    data = None
+    
+    #访问yobot api获取伤害等信息
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url) as resp:
+                data = await resp.json()
+    except Exception as e:
+        sv.logger.error(f'Error: {e}')
+        result['msg'] = '无法访问API，请检查yobot服务器状态'
+        return result
+
+    result['clanname'] = data['groupinfo'][0]['group_name']
+    result['game_server'] = data['groupinfo'][0]['game_server']
+
+    for name in data['members']:
+        if name['qqid'] == qqid:
+            result['nickname'] = name['nickname']
+    if not result['nickname']:
+        result['msg'] = '该用户的工会战记录不存在'
+        return result
+    for item in data['challenges']:
+        if item['qqid'] == qqid:
+            challenge = {
+                'damage': item['damage'],
+                'type': 0, #类型 0 普通 1 尾刀 2 补偿刀
+                'boss': item['boss_num'] - 1,
+                'cycle': item['cycle'],
+            }
+            if item['health_ramain'] == 0:
+                challenge['type'] = 1
+            elif item['is_continue']:
+                challenge['type'] = 2
+            result['challenge_list'].append(challenge)
+    result['code'] = 0
+    return result
+
+async def send_report(bot, event, background = 0):
     uid = None
     api_url = ""
     for m in event['message']:
@@ -203,32 +249,24 @@ async def send_report(bot, event, background):
         return
     lmt.start_cd(uid)
 
-    nickname = None
-    data = None
-    #访问yobot api获取伤害等信息
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as resp:
-                data = await resp.json()
-    except Exception as e:
-        sv.logger.error(f'Error: {e}')
-        await bot.send(event, '无法访问API，请检查yobot服务器状态', at_sender=True)
+    result = await get_data_from_yobot(api_url, uid)
+    if result['code'] != 0:
+        await bot.send(event, result['msg'], at_sender=True)
         return
+    result['background'] = background
+    msg = generate_report(result)
+    await bot.send(event, msg, at_sender=True)
 
-    clanname = data['groupinfo'][0]['group_name']
-    game_server = data['groupinfo'][0]['game_server']
-
-    challenge_list = []
-
-    for name in data['members']:
-        if name['qqid'] == uid:
-            nickname = name['nickname']
-    if nickname is None:
-        await bot.send(event, '该用户的工会战记录不存在', at_sender=True)
-        return
-    for item in data['challenges']:
-        if item['qqid'] == uid:
-            challenge_list.append(item)
+def generate_report(data):
+    if data['code'] != 0:
+        return data['msg']
+    nickname = data['nickname']
+    clanname = data['clanname']
+    game_server = data['game_server']
+    challenge_list = data['challenge_list']
+    background = bg_report
+    if 'background' in data and data['background'] == 1:
+        background = bg_resign
     
     total_challenge = 0 #总出刀数
     total_damage = 0    #总伤害
@@ -247,15 +285,32 @@ async def send_report(bot, event, background):
     else: #0 ~ battle_days-1
         current_days += 1
 
-    for challenge in challenge_list:
+    for i in range(0, len(challenge_list)):
+        challenge = challenge_list[i]
         total_damage += challenge['damage']
-        times_to_boss[challenge['boss_num']-1] += 1
-        if not challenge['is_continue']:
-            damage_to_boss[challenge['boss_num']-1] += challenge['damage']  #尾刀伤害不计入单boss总伤害，防止avg异常
-            truetimes_to_boss[challenge['boss_num']-1] += 1
+        times_to_boss[challenge['boss']] += 1
+        if challenge['damage'] == 0:    #掉刀
+            lost_challenge += 1
+        elif challenge['type'] == 0: #普通刀
+            damage_to_boss[challenge['boss']] += challenge['damage']  #尾刀伤害不计入单boss总伤害，防止avg异常
+            truetimes_to_boss[challenge['boss']] += 1
             total_challenge += 1
-            if challenge['damage'] == 0:    #掉刀
-                lost_challenge += 1
+        elif challenge['type'] == 1: #尾刀
+            if (i + 1) < len(challenge_list) and challenge_list[i+1]['type'] == 2: #下一刀是补偿刀
+                next_challenge = challenge_list[i+1]
+                if challenge['damage'] > next_challenge['damage']:
+                    damage_to_boss[challenge['boss']] += challenge['damage']
+                    damage_to_boss[challenge['boss']] += next_challenge['damage']
+                    truetimes_to_boss[challenge['boss']] += 1
+                else:
+                    damage_to_boss[next_challenge['boss']] += challenge['damage']
+                    damage_to_boss[next_challenge['boss']] += next_challenge['damage']
+                    truetimes_to_boss[next_challenge['boss']] += 1
+            else:
+                damage_to_boss[challenge['boss']] += challenge['damage']
+                truetimes_to_boss[challenge['boss']] += 1
+            total_challenge += 1
+
     if current_days * 3 < total_challenge: #如果会战排期改变 修正天数数据
         current_days =  math.ceil(float(total_challenge) / 3)
     avg_day_damage = int(total_damage/current_days)
@@ -379,16 +434,17 @@ async def send_report(bot, event, background):
     buf = BytesIO()
     img.save(buf,format='JPEG')
     base64_str = f'base64://{base64.b64encode(buf.getvalue()).decode()}'
-    await bot.send(event, f'[CQ:image,file={base64_str}]', at_sender=True)
+    msg = f'[CQ:image,file={base64_str}]'
     plt.close('all')
+    return msg
 
 @sv.on_prefix('生成离职报告')
 async def create_resign_report(bot, event: CQEvent):
-    await send_report(bot, event, bg_resign)
+    await send_report(bot, event, 1)
 
 @sv.on_prefix('生成会战报告')
 async def create_clanbattle_report(bot, event: CQEvent):
-    await send_report(bot, event, bg_report)
+    await send_report(bot, event, 0)
 
 @sv.on_prefix(('设置工会api', '设置公会api'))
 async def set_clanbattle_api(bot, event: CQEvent):
