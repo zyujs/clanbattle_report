@@ -4,8 +4,6 @@
 
 本项目地址 https://github.com/zyujs/clanbattle_report
 
-本项目适用于HoshinoBot v2
-
 ## 安装方法:
 
 1. 在HoshinoBot的插件目录modules下clone本项目 `git clone https://github.com/zyujs/clanbattle_report.git`
@@ -49,6 +47,6 @@ API格式为 `http://{yobot服务器}:{端口}/yobot/clan/{群号}/statistics/ap
 - 魔法の書 : 增强显示效果
 - 椎名真白 : 本项目基于HoshinoBot交流群椎名真白上传的"retire离职报告yobot版（V2）"项目重构
 
-## 开源
+## 许可
 
 本插件以GPL-v3协议开源
