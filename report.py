@@ -161,7 +161,7 @@ def get_constellation(server='cn'):
         if month < 1:
             month = 12
         elif month > 12:
-          month -= 12
+            month -= 12
     else:   #天数周期循环 国服
         during_month = (today - cdata['base_date']).days // cdata['cycle_days']
         month = during_month + cdata['base_month']
