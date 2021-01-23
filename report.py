@@ -288,7 +288,6 @@ def generate_report(data):
     i = 0
     while i < len(challenge_list):
         challenge = challenge_list[i]
-        total_damage += challenge['damage']
         times_to_boss[challenge['boss']] += 1
         if challenge['damage'] == 0:    #掉刀
             lost_challenge += 1
@@ -313,6 +312,10 @@ def generate_report(data):
                 truetimes_to_boss[challenge['boss']] += 1
             total_challenge += 1
         i += 1
+
+    for i in range(len(challenge_list)):
+        challenge = challenge_list[i]
+        total_damage += challenge['damage']
 
     if current_days * 3 < total_challenge: #如果会战排期改变 修正天数数据
         current_days =  math.ceil(float(total_challenge) / 3)
