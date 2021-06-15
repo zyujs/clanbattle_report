@@ -23,8 +23,8 @@ cycle_data = {
     'cn': {
         'cycle_mode': 'days',
         'cycle_days': 27,
-        'base_date': datetime.date(2020, 11, 17),  #从天蝎开始计算
-        'base_month': 9,
+        'base_date': datetime.date(2021, 5, 9),  #从金牛开始计算
+        'base_month': 3,
         'battle_days': 6,
         'reserve_days': 0
     },
